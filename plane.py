@@ -8,11 +8,12 @@ def lentomet(ft: int, inch: float) -> float:
 
 class Compartment:
     def __init__(self, config: pd.DataFrame) -> None:
-        self.conf = config
-        self.ba: float
+        self.conf =     config
+        self.weight:    float
+        self.ba:        float
         pass
 
-    def loadComp(self, weight: int) -> None:
+    def loadComp(self, weight: float) -> None:
         if self.conf["MAX"].sum() < weight:
             print("Weight to fill exceeds maximum compartment weight")
             return None
@@ -36,6 +37,11 @@ class Compartment:
         self.ba = moment / self.conf["WEIGHT"].sum()
 
         return None
+
+    def calCompWeight(self):
+        self.weight = self.conf["WEIGHT"].sum()
+
+        return None
     
     def printComp(self) -> None:
         print(self.conf)
@@ -49,7 +55,10 @@ class Compartment:
 @dataclass
 class Plane:
     # Dimensions
-    length = lentomet(242,4)
+    # length = lentomet(242,4)
+    OEW = 168682            # KG (NOT FROM KLM AS NO DOCUMENT EXISTS WITH OEW VALUES)
+    BALANCE_ARM = 1180.0    # ESTIMATE
+    MOMENT = OEW*BALANCE_ARM
 
     # Configuration for B77W
     # Forward Cargo Compartment
@@ -60,12 +69,3 @@ class Plane:
     config  = pd.read_csv(r"config/LD-3_AftCargoComp.csv")
     aftComp = Compartment(config)
 
-    # Testing
-    """
-    fwdComp.loadComp(30000)
-    fwdComp.printComp()
-    fwdComp.calCompBA()
-    fwdComp.printBA()
-    maccie = data.calmac(fwdComp.ba)
-    print(maccie)
-    """
