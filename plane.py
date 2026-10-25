@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import pandas as pd
+import data
 
 
 def lentomet(ft: int, inch: float) -> float:
@@ -11,10 +12,10 @@ class Compartment:
         self.ba: float
         pass
 
-    def fillComp(self, weight: int) -> None:
+    def loadComp(self, weight: int) -> None:
         if self.conf["MAX"].sum() < weight:
-            print("ERRORSKI")
-            return
+            print("Weight to fill exceeds maximum compartment weight")
+            return None
 
         counter = weight
         for row in self.conf[::-1].itertuples():
@@ -26,20 +27,45 @@ class Compartment:
                 self.conf.loc[row[0], 'WEIGHT'] = counter
                 counter = 0
 
-            print(self.conf)
-            
         return None
 
+    def calCompBA(self):
+        moment = 0
+        for row in self.conf.itertuples():
+            moment += (row[2] * row[3])
+        self.ba = moment / self.conf["WEIGHT"].sum()
+
+        return None
+    
+    def printComp(self) -> None:
+        print(self.conf)
+        return None
+
+    def printBA(self) -> None:
+        print(self.ba)
+        return None
 
 
 @dataclass
 class Plane:
     # Dimensions
-    length = lentomet(242,4)    # Meters
+    length = lentomet(242,4)
 
     # Configuration for B77W
-    fwdCompConf = pd.read_csv("config/FwdCargoComp.csv")
-    fwdComp = Compartment(fwdCompConf)
-    fwdComp.fillComp(5200)
+    # Forward Cargo Compartment
+    config  = pd.read_csv(r"config/LD-3_FwdCargoComp.csv")
+    fwdComp = Compartment(config)
 
-# print(Plane.fwdCompConf.__len__())
+    # Aft Cargo Compartment
+    config  = pd.read_csv(r"config/LD-3_AftCargoComp.csv")
+    aftComp = Compartment(config)
+
+    # Testing
+    """
+    fwdComp.loadComp(30000)
+    fwdComp.printComp()
+    fwdComp.calCompBA()
+    fwdComp.printBA()
+    maccie = data.calmac(fwdComp.ba)
+    print(maccie)
+    """
