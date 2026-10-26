@@ -83,11 +83,11 @@ class Plane:
 
     # Configuration for B77W
     # Forward Cargo Compartment
-    confFwd = pd.read_csv(r"config/LD-3_FwdCargoComp.csv")
+    confFwd = pd.read_csv(r"config/LD-3_FwdCargoComp_KG.csv")
     fwdComp = Cargo(confFwd)
 
     # Aft Cargo Compartment
-    confAft = pd.read_csv(r"config/LD-3_AftCargoComp.csv")
+    confAft = pd.read_csv(r"config/LD-3_AftCargoComp_KG.csv")
     aftComp = Cargo(confAft)
 
     # Cabin Compartments
