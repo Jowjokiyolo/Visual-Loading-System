@@ -11,12 +11,29 @@ def lbstokg(weight: float) -> float:
     return weight * 0.45359237
 
 
-class CargoCompartment:
+class Compartment:
     def __init__(self, config: pd.DataFrame) -> None:
         self.conf = config
         self.weight: float
         self.ba: float
 
+    def printComp(self) -> None:
+        print(self.conf)
+
+    def printBA(self) -> None:
+        print(self.ba)
+
+    def calBA(self) -> None:
+        moment = 0
+        for row in self.conf.itertuples():
+            moment += row[2] * row[3]
+        self.ba = moment / self.conf["WEIGHT"].sum()
+
+    def calWeight(self) -> None:
+        self.weight = self.conf["WEIGHT"].sum()
+
+
+class Cargo(Compartment):
     def load(self, weight: float, update_weight=False) -> None:
         if self.conf["MAX"].sum() < weight:
             print("Weight to fill exceeds maximum compartment weight")
@@ -37,28 +54,8 @@ class CargoCompartment:
 
         return
 
-    def calBA(self):
-        moment = 0
-        for row in self.conf.itertuples():
-            moment += row[2] * row[3]
-        self.ba = moment / lbstokg(self.conf["WEIGHT"].sum())
 
-    def calWeight(self):
-        self.weight = lbstokg(self.conf["WEIGHT"].sum())
-
-    def printComp(self) -> None:
-        print(self.conf)
-
-    def printBA(self) -> None:
-        print(self.ba)
-
-
-class CabinCompartment:
-    def __init__(self, config: pd.DataFrame) -> None:
-        self.conf = config
-        self.weight: float
-        self.ba: float
-
+class Cabin(Compartment):
     def load(self, pax: int) -> None:
         if pax > self.conf.__len__():
             print("ERRORSKI")
@@ -84,25 +81,25 @@ class Plane:
     # Configuration for B77W
     # Forward Cargo Compartment
     confFwd = pd.read_csv(r"config/LD-3_FwdCargoComp.csv")
-    fwdComp = CargoCompartment(confFwd)
+    fwdComp = Cargo(confFwd)
 
     # Aft Cargo Compartment
     confAft = pd.read_csv(r"config/LD-3_AftCargoComp.csv")
-    aftComp = CargoCompartment(confAft)
+    aftComp = Cargo(confAft)
 
     # Cabin Compartments
     # Business Class
     config01 = pd.read_csv(r"config/01_CabinBusiness.csv")
-    business = CabinCompartment(config01)
+    business = Cabin(config01)
 
     # Premium Economy and Economy
     config02 = pd.read_csv(r"config/02_CabinPremPlusEcon.csv")
-    premEcon = CabinCompartment(config02)
+    premEcon = Cabin(config02)
 
     # Economy Overwing
     config03 = pd.read_csv(r"config/03_CabinOverwing.csv")
-    overwing = CabinCompartment(config03)
+    overwing = Cabin(config03)
 
     # Economy Rear
     config04 = pd.read_csv(r"config/04_CabinAft.csv")
-    aft = CabinCompartment(config04)
+    aft = Cabin(config04)
