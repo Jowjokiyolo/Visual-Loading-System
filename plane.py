@@ -17,6 +17,9 @@ class Compartment:
         self.weight: float
         self.ba: float
 
+    def __str__(self) -> str:
+        return f"{self.printComp()}"
+
     def printComp(self) -> None:
         print(self.conf)
 
