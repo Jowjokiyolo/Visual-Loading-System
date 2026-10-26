@@ -1,71 +1,108 @@
 from dataclasses import dataclass
+
 import pandas as pd
-import data
 
 
 def lentomet(ft: int, inch: float) -> float:
-    return ft*0.3048 + inch*25.4/1000
+    return ft * 0.3048 + inch * 25.4 / 1000
 
-class Compartment:
+
+def lbstokg(weight: float) -> float:
+    return weight * 0.45359237
+
+
+class CargoCompartment:
     def __init__(self, config: pd.DataFrame) -> None:
-        self.conf =     config
-        self.weight:    float
-        self.ba:        float
-        pass
+        self.conf = config
+        self.weight: float
+        self.ba: float
 
-    def loadComp(self, weight: float) -> None:
+    def load(self, weight: float, update_weight=False) -> None:
         if self.conf["MAX"].sum() < weight:
             print("Weight to fill exceeds maximum compartment weight")
-            return None
+            return
 
         counter = weight
-        for row in self.conf[::-1].itertuples():
+        for row in self.conf[::-1].itertuples():  # Fills from rear
             if counter >= row[4]:
-                self.conf.loc[row[0], 'WEIGHT'] = row[4]
+                self.conf.loc[row[0], "WEIGHT"] = row[4]
                 counter -= row[4]
 
             else:
-                self.conf.loc[row[0], 'WEIGHT'] = counter
+                self.conf.loc[row[0], "WEIGHT"] = counter
                 counter = 0
 
-        return None
+        if update_weight:
+            self.calWeight()
 
-    def calCompBA(self):
+        return
+
+    def calBA(self):
         moment = 0
         for row in self.conf.itertuples():
-            moment += (row[2] * row[3])
-        self.ba = moment / self.conf["WEIGHT"].sum()
+            moment += row[2] * row[3]
+        self.ba = moment / lbstokg(self.conf["WEIGHT"].sum())
 
-        return None
+    def calWeight(self):
+        self.weight = lbstokg(self.conf["WEIGHT"].sum())
 
-    def calCompWeight(self):
-        self.weight = self.conf["WEIGHT"].sum()
-
-        return None
-    
     def printComp(self) -> None:
         print(self.conf)
-        return None
 
     def printBA(self) -> None:
         print(self.ba)
-        return None
+
+
+class CabinCompartment:
+    def __init__(self, config: pd.DataFrame) -> None:
+        self.conf = config
+        self.weight: float
+        self.ba: float
+
+    def load(self, pax: int) -> None:
+        if pax > self.conf.__len__():
+            print("ERRORSKI")
+            return
+
+        paxmass = 84  # KG
+        for row in self.conf.itertuples():
+            if pax > 0:
+                self.conf.loc[row[0], "WEIGHT"] = paxmass
+                pax -= 1
+            else:
+                self.conf.loc[row[0], "WEIGHT"] = 0
 
 
 @dataclass
 class Plane:
     # Dimensions
     # length = lentomet(242,4)
-    OEW = 168682            # KG (NOT FROM KLM AS NO DOCUMENT EXISTS WITH OEW VALUES)
-    BALANCE_ARM = 1180.0    # ESTIMATE
-    MOMENT = OEW*BALANCE_ARM
+    OEW = 168682  # KG (NOT FROM KLM AS NO DOCUMENT EXISTS WITH OEW VALUES)
+    BALANCE_ARM = 1180.0  # ESTIMATE INCHES FROM DATUM
+    MOMENT = OEW * BALANCE_ARM
 
     # Configuration for B77W
     # Forward Cargo Compartment
-    config  = pd.read_csv(r"config/LD-3_FwdCargoComp.csv")
-    fwdComp = Compartment(config)
+    confFwd = pd.read_csv(r"config/LD-3_FwdCargoComp.csv")
+    fwdComp = CargoCompartment(confFwd)
 
     # Aft Cargo Compartment
-    config  = pd.read_csv(r"config/LD-3_AftCargoComp.csv")
-    aftComp = Compartment(config)
+    confAft = pd.read_csv(r"config/LD-3_AftCargoComp.csv")
+    aftComp = CargoCompartment(confAft)
 
+    # Cabin Compartments
+    # Business Class
+    config01 = pd.read_csv(r"config/01_CabinBusiness.csv")
+    business = CabinCompartment(config01)
+
+    # Premium Economy and Economy
+    config02 = pd.read_csv(r"config/02_CabinPremPlusEcon.csv")
+    premEcon = CabinCompartment(config02)
+
+    # Economy Overwing
+    config03 = pd.read_csv(r"config/03_CabinOverwing.csv")
+    overwing = CabinCompartment(config03)
+
+    # Economy Rear
+    config04 = pd.read_csv(r"config/04_CabinAft.csv")
+    aft = CabinCompartment(config04)
