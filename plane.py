@@ -11,6 +11,10 @@ def lbstokg(weight: float) -> float:
     return weight * 0.45359237
 
 
+def calmac(ba: float) -> float:
+    return ((ba - 1174.5) * 100.0) / 278.5
+
+
 class Compartment:
     def __init__(self, config: pd.DataFrame) -> None:
         self.conf = config
@@ -30,6 +34,10 @@ class Compartment:
         self.weight = self.conf["WEIGHT"].sum()
 
     def calBA(self) -> None:
+        if self.weight == 0:
+            self.ba = self.conf["BA"].mean()
+            return
+
         moment = 0
         for row in self.conf.itertuples():
             moment += row[2] * row[3]
@@ -63,7 +71,7 @@ class Cargo(Compartment):
 
 class Cabin(Compartment):
     def load(self, pax: int, update_weight=True) -> None:
-        if pax > self.conf.__len__():
+        if pax > len(self.conf):
             raise ValueError(
                 f"Passenger count of {pax} exceeds maximum passengers for compartment ({self.conf.__len__()})"
             )
@@ -112,6 +120,18 @@ class Plane:
     BALANCE_ARM = 1180.0  # ESTIMATE INCHES FROM DATUM
     MOMENT = OEW * BALANCE_ARM
 
+    mac: float
+
+    def calBalance(compartments: tuple[Compartment, ...]) -> None:
+        weight = Plane.OEW
+        moment = Plane.MOMENT
+        for comp in compartments:
+            weight += comp.weight
+            moment += comp.ba * comp.weight
+
+        ba = moment / weight
+        Plane.mac = calmac(ba)
+
     # Configuration for B77W
     # Forward Cargo Compartment
     confFwd = pd.read_csv(r"config/LD-3_FwdCargoComp_KG.csv")
@@ -128,16 +148,18 @@ class Plane:
 
     # Premium Economy and Economy
     config02 = pd.read_csv(r"config/02_CabinPremPlusEcon.csv")
-    premEcon = Cabin(config02)
+    econPrem = Cabin(config02)
 
     # Economy Overwing
     config03 = pd.read_csv(r"config/03_CabinOverwing.csv")
-    wingEcon = Cabin(config03)
+    econWing = Cabin(config03)
 
     # Economy Rear
     config04 = pd.read_csv(r"config/04_CabinAft.csv")
-    rearEcon = Cabin(config04)
+    econRear = Cabin(config04)
 
     # Fuel
     confFuel = pd.read_csv(r"config/FuelTanks.csv")
-    FuelTank = Fuel(confFuel)
+    fuelTank = Fuel(confFuel)
+
+    COMPARTMENTS = (fwdCarg, aftCarg, business, econPrem, econWing, econRear, fuelTank)
