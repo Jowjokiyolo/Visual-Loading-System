@@ -42,9 +42,10 @@ class Compartment:
 
 class Cargo(Compartment):
     def load(self, weight: float, update_weight=True) -> None:
-        if self.conf["MAX"].sum() < weight:
-            print("Weight to fill exceeds maximum compartment weight")
-            return
+        if weight > self.conf["MAX"].sum():
+            raise ValueError(
+                f"Weight of {weight} kg exceeds maximum compartment weight ({self.conf['MAX'].sum()} kg)"
+            )
 
         counter = weight
         for row in self.conf[::-1].itertuples():  # Fills from rear
@@ -59,14 +60,13 @@ class Cargo(Compartment):
         if update_weight:
             self.update_weight_ba()
 
-        return
-
 
 class Cabin(Compartment):
     def load(self, pax: int, update_weight=True) -> None:
         if pax > self.conf.__len__():
-            print("ERRORSKI")
-            return
+            raise ValueError(
+                f"Passenger count of {pax} exceeds maximum passengers for compartment ({self.conf.__len__()})"
+            )
 
         paxmass = 84  # KG
         for row in self.conf.itertuples():
@@ -75,6 +75,30 @@ class Cabin(Compartment):
                 pax -= 1
             else:
                 self.conf.loc[row[0], "WEIGHT"] = 0
+
+        if update_weight:
+            self.update_weight_ba()
+
+
+class Fuel(Compartment):
+    def load(self, weight: float, update_weight=True) -> None:
+        count = weight
+        if weight > self.conf["MAX"].sum():
+            raise ValueError(
+                f"Weight of {weight} kg exceeds max tank capacity ({self.conf['MAX'].sum()} kg)"
+            )
+
+        elif weight >= 2 * self.conf.loc[0, "MAX"]:
+            count -= 2 * self.conf.loc[0, "MAX"]
+            self.conf.loc[0, "WEIGHT"] = self.conf.loc[0, "MAX"]
+            self.conf.loc[1, "WEIGHT"] = self.conf.loc[1, "MAX"]
+            self.conf.loc[2, "WEIGHT"] = count
+
+        elif weight < 2 * self.conf.loc[0, "MAX"]:
+            count /= 2
+            self.conf.loc[0, "WEIGHT"] = count
+            self.conf.loc[1, "WEIGHT"] = count
+            self.conf.loc[2, "WEIGHT"] = 0
 
         if update_weight:
             self.update_weight_ba()
@@ -114,3 +138,6 @@ class Plane:
     config04 = pd.read_csv(r"config/04_CabinAft.csv")
     rearEcon = Cabin(config04)
 
+    # Fuel
+    confFuel = pd.read_csv(r"config/FuelTanks.csv")
+    FuelTank = Fuel(confFuel)
