@@ -118,52 +118,52 @@ class Fuel(Compartment):
 class Plane:
     # Dimensions
     # length = lentomet(242,4)
-    OEW = 168682  # KG (NOT FROM KLM AS NO DOCUMENT EXISTS WITH OEW VALUES)
-    BALANCE_ARM = 1180.0  # ESTIMATE INCHES FROM DATUM
-    MOMENT = OEW * BALANCE_ARM
+    _OEW = 168682  # KG (NOT FROM KLM AS NO DOCUMENT EXISTS WITH OEW VALUES)
+    _BALANCE_ARM = 1180.0  # ESTIMATE INCHES FROM DATUM
+    _MOMENT = _OEW * _BALANCE_ARM
 
     mac: float
+    weight: float
 
     def calBalance(compartments: tuple[Compartment, ...]) -> None:
-        weight = Plane.OEW
-        moment = Plane.MOMENT
+        weight = Plane._OEW
+        moment = Plane._MOMENT
         for comp in compartments:
             weight += comp.weight
             moment += comp.ba * comp.weight
 
         ba = moment / weight
         Plane.mac = calmac(ba)
+        Plane.weight = weight
 
     # Configuration for B77W
     # Forward Cargo Compartment
-    confFwd = pd.read_csv(r"config/LD-3_FwdCargoComp_KG.csv")
-    fwdCarg = Cargo(confFwd)
-    print(confFwd["MAX"].sum())
+    _confFwd = pd.read_csv(r"config/LD-3_FwdCargoComp_KG.csv")
+    fwdCarg = Cargo(_confFwd)
 
     # Aft Cargo Compartment
-    confAft = pd.read_csv(r"config/LD-3_AftCargoComp_KG.csv")
-    aftCarg = Cargo(confAft)
-    print(confAft["MAX"].sum())
+    _confAft = pd.read_csv(r"config/LD-3_AftCargoComp_KG.csv")
+    aftCarg = Cargo(_confAft)
     # Cabin Compartments
     # Business Class
-    config01 = pd.read_csv(r"config/01_CabinBusiness.csv")
-    business = Cabin(config01)
+    _config01 = pd.read_csv(r"config/01_CabinBusiness.csv")
+    business = Cabin(_config01)
 
     # Premium Economy and Economy
-    config02 = pd.read_csv(r"config/02_CabinPremPlusEcon.csv")
-    econPrem = Cabin(config02)
+    _config02 = pd.read_csv(r"config/02_CabinPremPlusEcon.csv")
+    econPrem = Cabin(_config02)
 
     # Economy Overwing
-    config03 = pd.read_csv(r"config/03_CabinOverwing.csv")
-    econWing = Cabin(config03)
+    _config03 = pd.read_csv(r"config/03_CabinOverwing.csv")
+    econWing = Cabin(_config03)
 
     # Economy Rear
-    config04 = pd.read_csv(r"config/04_CabinAft.csv")
-    econRear = Cabin(config04)
+    _config04 = pd.read_csv(r"config/04_CabinAft.csv")
+    econRear = Cabin(_config04)
 
     # Fuel
-    confFuel = pd.read_csv(r"config/FuelTanks.csv")
-    fuelTank = Fuel(confFuel)
+    _confFuel = pd.read_csv(r"config/FuelTanks.csv")
+    fuelTank = Fuel(_confFuel)
 
     COMPARTMENTS = (
         fwdCarg,

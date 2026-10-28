@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 
 
-def mkplot(weight: float, mac_cg: float):
+def mkplot(mac_cg: float, weight: float):
     # Main Bounds
     x_mac = (
         26.9,
