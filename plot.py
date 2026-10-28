@@ -75,7 +75,7 @@ def mkplot(mac_cg: float, weight: float):
     plt.text(15, 250500, "251290 KG", ha="left", va="top")
 
     # CG Points
-    icon = img.imread(r"Center_of_Gravity_symbol.png")
+    icon = img.imread(r"img/Center_of_Gravity_symbol.png")
     icon_box = AnnotationBbox(
         OffsetImage(icon, zoom=0.05),
         (mac_cg, weight),

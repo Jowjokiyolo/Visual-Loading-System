@@ -34,7 +34,7 @@ def main():
     entry_zone4 = Entry(window)
     entry_zone4.place(x=600, y=90, width=70, height=30)
 
-    image1_image = ImageTk.PhotoImage(Image.open("image.png").resize((640, 120)))
+    image1_image = ImageTk.PhotoImage(Image.open(r"img/plane.png").resize((640, 120)))
     image1 = Label(window, image=image1_image)
     image1.place(x=30, y=150, width=640, height=120)
 
