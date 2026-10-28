@@ -22,7 +22,9 @@ class Compartment:
         self.ba: float
 
     def __str__(self) -> str:
-        return f"Compartment Weight:\t{self.weight}\nWith Balance Arm:\t{self.ba}"
+        return (
+            f"Compartment Weight:\t{self.weight}\nWith Balance Arm:\t{self.ba}"
+        )
 
     def printComp(self) -> None:
         print(self.conf)
@@ -136,11 +138,12 @@ class Plane:
     # Forward Cargo Compartment
     confFwd = pd.read_csv(r"config/LD-3_FwdCargoComp_KG.csv")
     fwdCarg = Cargo(confFwd)
+    print(confFwd["MAX"].sum())
 
     # Aft Cargo Compartment
     confAft = pd.read_csv(r"config/LD-3_AftCargoComp_KG.csv")
     aftCarg = Cargo(confAft)
-
+    print(confAft["MAX"].sum())
     # Cabin Compartments
     # Business Class
     config01 = pd.read_csv(r"config/01_CabinBusiness.csv")
@@ -162,4 +165,12 @@ class Plane:
     confFuel = pd.read_csv(r"config/FuelTanks.csv")
     fuelTank = Fuel(confFuel)
 
-    COMPARTMENTS = (fwdCarg, aftCarg, business, econPrem, econWing, econRear, fuelTank)
+    COMPARTMENTS = (
+        fwdCarg,
+        aftCarg,
+        business,
+        econPrem,
+        econWing,
+        econRear,
+        fuelTank,
+    )

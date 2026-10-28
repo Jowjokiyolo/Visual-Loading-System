@@ -1,6 +1,6 @@
 [project]
-name = "vls"
-version = "0.1.0"
+name = "VisualLoadingSystem"
+version = "2026.10.30"
 dependencies = [
     "matplotlib>=3.11",
     "pandas>=3.1",
