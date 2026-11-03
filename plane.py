@@ -113,7 +113,7 @@ class Fuel(Compartment):
         if update_weight:
             self.update_weight_ba()
 
-
+@dataclass
 class Plane:
     mac_tow: float
     tow: float
