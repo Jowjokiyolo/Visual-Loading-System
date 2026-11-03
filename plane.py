@@ -114,18 +114,21 @@ class Fuel(Compartment):
             self.update_weight_ba()
 
 
-@dataclass
 class Plane:
+    mac_tow: float
+    tow: float
+    mac_law: float
+    law: float
+    mac_zfw: float
+    zfw: float
+
     # Dimensions
     # length = lentomet(242,4)
     _OEW = 168682  # KG (NOT FROM KLM AS NO DOCUMENT EXISTS WITH OEW VALUES)
     _BALANCE_ARM = 1180.0  # ESTIMATE INCHES FROM DATUM
     _MOMENT = _OEW * _BALANCE_ARM
 
-    mac: float
-    grossweight: float
-
-    def calBalance(compartments: tuple[Compartment, ...]) -> None:
+    def calBalance(compartments: tuple[Compartment, ...], wtype: str) -> None:
         weight = Plane._OEW
         moment = Plane._MOMENT
         for comp in compartments:
@@ -133,8 +136,39 @@ class Plane:
             moment += comp.ba * comp.weight
 
         ba = moment / weight
-        Plane.mac = calmac(ba)
-        Plane.grossweight = weight
+        match wtype:
+            case "tow":
+                Plane.mac_tow = calmac(ba)
+                Plane.tow = weight
+            case "law":
+                Plane.mac_law = calmac(ba)
+                Plane.law = weight
+            case "zfw":
+                Plane.mac_zfw = calmac(ba)
+                Plane.zfw = weight
+
+    def calLaw(
+        compartments: tuple[Compartment, ...],
+        block_fuel: tuple,
+        trip_fuel: float,
+    ) -> None:
+        for i in compartments:
+            if isinstance(i, Fuel):
+                i.load(block_fuel - trip_fuel)
+                i.update_weight_ba()
+            else:
+                continue
+
+        Plane.calBalance(compartments, "law")
+
+    def calZfw(compartments: tuple[Compartment, ...]) -> None:
+        for i in compartments:
+            if isinstance(i, Fuel):
+                i.load(0)
+                i.update_weight_ba()
+            else:
+                continue
+        Plane.calBalance(compartments, "zfw")
 
     # Configuration for B77W
     # Forward Cargo Compartment

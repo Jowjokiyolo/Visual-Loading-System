@@ -124,7 +124,7 @@
               <object class="GtkLabel" id="lcf">
                 <property name="justify">center</property>
                 <property name="label">Enter Fwd Cargo
-(Max 19800 kg)</property>
+(Max 19700 kg)</property>
                 <layout>
                   <property name="column">0</property>
                   <property name="column-span">1</property>
@@ -170,7 +170,7 @@
               <object class="GtkLabel" id="lbf">
                 <property name="justify">center</property>
                 <property name="label">Enter Block Fuel
-(Max 154300 kg)</property>
+(Max 154200 kg)</property>
                 <layout>
                   <property name="column">0</property>
                   <property name="column-span">1</property>

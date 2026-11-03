@@ -39,8 +39,17 @@ class CambalacheApp(Adw.Application):
             Plane.fwdCarg.load(ecf)
             Plane.aftCarg.load(eca)
 
-            Plane.calBalance(Plane.COMPARTMENTS)
-            plot.mkplot(Plane.mac, Plane.grossweight, etf)
+            Plane.calBalance(Plane.COMPARTMENTS, "tow")
+            Plane.calLaw(Plane.COMPARTMENTS, ebf, etf)
+            Plane.calZfw(Plane.COMPARTMENTS)
+            plot.mkplot(
+                Plane.mac_tow,
+                Plane.tow,
+                Plane.mac_law,
+                Plane.law,
+                Plane.mac_zfw,
+                Plane.zfw,
+            )
 
         bplot = builder.get_object("bplot")
         bplot.connect("clicked", do_plot)

@@ -3,7 +3,14 @@ import matplotlib.pyplot as plt
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 
 
-def mkplot(mac_cg: float, weight: float, trip_fuel: float):
+def mkplot(
+    mac_tow: float,
+    tow: float,
+    mac_law: float,
+    law: float,
+    mac_zfw: float,
+    zfw: float,
+):
     # Main Bounds
     x_mac = (
         26.9,
@@ -74,13 +81,53 @@ def mkplot(mac_cg: float, weight: float, trip_fuel: float):
     plt.text(15, 251500, "MLW", ha="left", va="bottom")
     plt.text(15, 250500, "251290 KG", ha="left", va="top")
 
-    # CG Points
+    # TOW Point
     icon = img.imread(r"img/Center_of_Gravity_symbol.png")
     icon_box = AnnotationBbox(
         OffsetImage(icon, zoom=0.05),
-        (mac_cg, weight),
+        (mac_tow, tow),
         frameon=False,
     )
     plt.gca().add_artist(icon_box)
+    plt.annotate(
+        "TOW",
+        xy=(mac_tow, tow),
+        xytext=(5, 5),
+        textcoords="offset points",
+        ha="left",
+        va="bottom",
+    )
+
+    # LAW Point
+    law_icon_box = AnnotationBbox(
+        OffsetImage(icon, zoom=0.05),
+        (mac_law, law),
+        frameon=False,
+    )
+    plt.gca().add_artist(law_icon_box)
+    plt.annotate(
+        "LAW",
+        xy=(mac_law, law),
+        xytext=(5, 5),
+        textcoords="offset points",
+        ha="left",
+        va="bottom",
+    )
+
+    # ZFW Point
+    zfw_icon_box = AnnotationBbox(
+        OffsetImage(icon, zoom=0.05),
+        (mac_zfw, zfw),
+        frameon=False,
+    )
+    plt.gca().add_artist(zfw_icon_box)
+    plt.annotate(
+        "ZFW",
+        xy=(mac_zfw, zfw),
+        xytext=(5, 5),
+        textcoords="offset points",
+        ha="left",
+        va="bottom",
+    )
 
     plt.show(block=False)
