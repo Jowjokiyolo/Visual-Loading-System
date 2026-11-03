@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.offsetbox import AnnotationBbox, OffsetImage
 
 
-def mkplot(mac_cg: float, weight: float):
+def mkplot(mac_cg: float, weight: float, trip_fuel: float):
     # Main Bounds
     x_mac = (
         26.9,
@@ -83,4 +83,4 @@ def mkplot(mac_cg: float, weight: float):
     )
     plt.gca().add_artist(icon_box)
 
-    plt.show()
+    plt.show(block=False)

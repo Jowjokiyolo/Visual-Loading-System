@@ -123,7 +123,7 @@ class Plane:
     _MOMENT = _OEW * _BALANCE_ARM
 
     mac: float
-    weight: float
+    grossweight: float
 
     def calBalance(compartments: tuple[Compartment, ...]) -> None:
         weight = Plane._OEW
@@ -134,7 +134,7 @@ class Plane:
 
         ba = moment / weight
         Plane.mac = calmac(ba)
-        Plane.weight = weight
+        Plane.grossweight = weight
 
     # Configuration for B77W
     # Forward Cargo Compartment

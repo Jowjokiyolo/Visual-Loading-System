@@ -1,0 +1,12 @@
+name: vls
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - PyGObject
+  - matplotlib
+  - pandas
+  - pillow
+  - pycairo
+  - gtk4
+  - libadwaita
